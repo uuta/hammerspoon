@@ -7,5 +7,15 @@ spoon.ShiftIt:bindHotkeys({
     maximum = {{'ctrl', 'cmd'}, 'm'}
 });
 
-hs.hotkey.bind({"ctrl"}, "L",
+-- TODO: Consolidate processes into a single function
+hs.hotkey.bind({"ctrl"}, "P",
                function() hs.application.launchOrFocus("WezTerm") end)
+
+hs.hotkey.bind({"ctrl"}, "O",
+               function() hs.application.launchOrFocus("Google Chrome") end)
+
+hs.hotkey.bind({"ctrl"}, "U",
+               function() hs.application.launchOrFocus("DBeaver") end)
+
+hs.hotkey.bind({"ctrl"}, "Y",
+               function() hs.application.launchOrFocus("Spotify") end)
