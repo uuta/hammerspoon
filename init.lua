@@ -7,15 +7,22 @@ spoon.ShiftIt:bindHotkeys({
     maximum = {{'ctrl', 'cmd'}, 'm'}
 });
 
--- TODO: Consolidate processes into a single function
-hs.hotkey.bind({"ctrl"}, "P",
-               function() hs.application.launchOrFocus("WezTerm") end)
+local keys = {
+    {{"ctrl"}, "P", "WezTerm"}, {{"ctrl"}, "O", "Google Chrome"},
+    {{"ctrl"}, "K", "DBeaver"}, {{"ctrl"}, "Y", "Spotify"}
+}
 
-hs.hotkey.bind({"ctrl"}, "O",
-               function() hs.application.launchOrFocus("Google Chrome") end)
-
-hs.hotkey.bind({"ctrl"}, "U",
-               function() hs.application.launchOrFocus("DBeaver") end)
-
-hs.hotkey.bind({"ctrl"}, "Y",
-               function() hs.application.launchOrFocus("Spotify") end)
+for i, key in ipairs(keys) do
+    hs.hotkey.bind(key[1], key[2], function()
+        local app = hs.application.find(key[3])
+        if app then
+            if app:isFrontmost() then
+                app:hide()
+            else
+                app:activate()
+            end
+        else
+            hs.application.launchOrFocus(key[3])
+        end
+    end)
+end
