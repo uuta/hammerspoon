@@ -10,7 +10,7 @@ spoon.ShiftIt:bindHotkeys({
 local keys = {
     {{"ctrl"}, "P", "WezTerm"}, {{"ctrl"}, "O", "Google Chrome"},
     {{"ctrl"}, "M", "DBeaver"}, {{"ctrl"}, "Y", "Spotify"},
-    {{"ctrl"}, "J", "Anki"}
+    {{"ctrl"}, "N", "Anki"}
 }
 
 for i, key in ipairs(keys) do
