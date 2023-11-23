@@ -12,7 +12,7 @@ spoon.ShiftIt:bindHotkeys({
 local keys = {
     {{"ctrl"}, "P", "WezTerm"}, {{"ctrl"}, "O", "Google Chrome"},
     {{"ctrl"}, "M", "DBeaver"}, {{"ctrl"}, "Y", "Spotify"},
-    {{"ctrl"}, "N", "Anki"}
+    {{"ctrl"}, "N", "Anki"}, {{"ctrl"}, ";", "Figma"}
 }
 
 for _, key in ipairs(keys) do
@@ -34,11 +34,11 @@ local function handleEvent(event)
     local rawFlags = event:rawFlags()
     -- Modify the numbers in conditions to be allocated to your keyboard with HammerSpoon
     -- print(rawFlags)
-    if rawFlags == 131330 then
+    if rawFlags == 1974574 then
         lhs.eventtap.keyStroke({"cmd"}, "[")
         return true
     end
-    if rawFlags == 262401 then
+    if rawFlags == 1966389 then
         lhs.eventtap.keyStroke({"cmd"}, "]")
         return true
     end
