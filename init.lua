@@ -45,6 +45,7 @@ local function handleEvent(event)
     return false
 end
 
-local eventtap = lhs.eventtap.new({lhs.eventtap.event.types.flagsChanged},
-                                  handleEvent)
-eventtap:start()
+-- https://chat.openai.com/share/1aa92488-436c-434c-935b-65e61e458e25
+_G.eventtap = lhs.eventtap.new({lhs.eventtap.event.types.flagsChanged},
+                               handleEvent)
+_G.eventtap:start()
