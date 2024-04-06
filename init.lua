@@ -69,14 +69,14 @@ if isChrome() then
     end)
 end
 
-lhs.hotkey.bind({"ctrl", "option"}, "l",
+lhs.hotkey.bind({"ctrl", "shift"}, "l",
                 function() lhs.eventtap.keyStroke({}, "Right", true) end)
 --
-lhs.hotkey.bind({"ctrl", "option"}, "h",
+lhs.hotkey.bind({"ctrl", "shift"}, "h",
                 function() lhs.eventtap.keyStroke({}, "Left", true) end)
 
-lhs.hotkey.bind({"ctrl", "option"}, "j",
+lhs.hotkey.bind({"ctrl", "shift"}, "j",
                 function() lhs.eventtap.keyStroke({}, "Down", true) end)
 
-lhs.hotkey.bind({"option"}, "k",
+lhs.hotkey.bind({"ctrl", "shift"}, "k",
                 function() lhs.eventtap.keyStroke({}, "Up", true) end)
