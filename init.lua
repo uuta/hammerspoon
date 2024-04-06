@@ -50,25 +50,34 @@ _G.eventtap = lhs.eventtap.new({lhs.eventtap.event.types.flagsChanged},
                                handleEvent)
 _G.eventtap:start()
 
--- Set the shortcut to move tab in Chrome
-local function isChrome()
-    return lhs.application.frontmostApplication():name() == "Google Chrome"
-end
---
--- Set the shortcut to move tab to the right
-if isChrome() then
-    lhs.hotkey.bind({"ctrl"}, "l", function()
-        lhs.eventtap.keyStroke({"cmd", "option"}, "Right", true)
-    end)
-end
+----------------------------------------
+-- Google Chrome Window Management
+----------------------------------------
+local chromeToRight = lhs.hotkey.new({"ctrl"}, "l", function()
+    lhs.eventtap.keyStroke({"cmd", "option"}, "Right", true)
+end)
 
--- Set the shortcut to move tab to the left
-if isChrome() then
-    lhs.hotkey.bind({"ctrl"}, "h", function()
-        lhs.eventtap.keyStroke({"cmd", "option"}, "Left", true)
-    end)
-end
+local chromeToLeft = lhs.hotkey.new({"ctrl"}, "h", function()
+    lhs.eventtap.keyStroke({"cmd", "option"}, "Left", true)
+end)
 
+-- Initialize a Google Chrome window filter
+local GoogleChromeWF = lhs.window.filter.new("Google Chrome")
+
+-- Subscribe to when your Google Chrome window is focused and unfocused
+GoogleChromeWF:subscribe(lhs.window.filter.windowFocused, function()
+    -- Enable hotkey in Google Chrome
+    chromeToLeft:enable()
+    chromeToRight:enable()
+end):subscribe(lhs.window.filter.windowUnfocused, function()
+    -- Disable hotkey when focusing out of Google Chrome
+    chromeToLeft:disable()
+    chromeToRight:enable()
+end)
+
+----------------------------------------
+-- Directional Keybindings
+----------------------------------------
 lhs.hotkey.bind({"ctrl", "shift"}, "l",
                 function() lhs.eventtap.keyStroke({}, "Right", true) end)
 --
