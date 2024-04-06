@@ -49,3 +49,21 @@ end
 _G.eventtap = lhs.eventtap.new({lhs.eventtap.event.types.flagsChanged},
                                handleEvent)
 _G.eventtap:start()
+
+local function isChrome()
+    return lhs.application.frontmostApplication():name() == "Google Chrome"
+end
+
+-- Set the shortcut to move tab to the right
+lhs.hotkey.bind({"ctrl"}, "l", function()
+    if isChrome() then
+        lhs.eventtap.keyStroke({"cmd", "option"}, "Right", true)
+    end
+end)
+
+-- Set the shortcut to move tab to the left
+lhs.hotkey.bind({"ctrl"}, "h", function()
+    if isChrome() then
+        lhs.eventtap.keyStroke({"cmd", "option"}, "Left", true)
+    end
+end)
