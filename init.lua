@@ -54,11 +54,11 @@ _G.eventtap:start()
 -- Google Chrome Window Management
 ----------------------------------------
 local chromeToRight = lhs.hotkey.new({"ctrl"}, "l", function()
-    lhs.eventtap.keyStroke({"cmd", "option"}, "Right", true)
+    lhs.eventtap.keyStroke({"cmd", "option"}, "Right", 0)
 end)
 
 local chromeToLeft = lhs.hotkey.new({"ctrl"}, "h", function()
-    lhs.eventtap.keyStroke({"cmd", "option"}, "Left", true)
+    lhs.eventtap.keyStroke({"cmd", "option"}, "Left", 0)
 end)
 
 -- Initialize a Google Chrome window filter
