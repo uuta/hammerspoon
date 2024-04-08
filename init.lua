@@ -72,7 +72,7 @@ GoogleChromeWF:subscribe(lhs.window.filter.windowFocused, function()
 end):subscribe(lhs.window.filter.windowUnfocused, function()
     -- Disable hotkey when focusing out of Google Chrome
     chromeToLeft:disable()
-    chromeToRight:enable()
+    chromeToRight:disable()
 end)
 
 ----------------------------------------
