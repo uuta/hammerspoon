@@ -78,14 +78,14 @@ end)
 ----------------------------------------
 -- Directional Keybindings
 ----------------------------------------
-lhs.hotkey.bind({"ctrl", "shift"}, "l",
+lhs.hotkey.bind({"ctrl", "option"}, "l",
                 function() lhs.eventtap.keyStroke({}, "Right", true) end)
 --
-lhs.hotkey.bind({"ctrl", "shift"}, "h",
+lhs.hotkey.bind({"ctrl", "option"}, "h",
                 function() lhs.eventtap.keyStroke({}, "Left", true) end)
 
-lhs.hotkey.bind({"ctrl", "shift"}, "j",
+lhs.hotkey.bind({"ctrl", "option"}, "j",
                 function() lhs.eventtap.keyStroke({}, "Down", true) end)
 
-lhs.hotkey.bind({"ctrl", "shift"}, "k",
+lhs.hotkey.bind({"ctrl", "option"}, "k",
                 function() lhs.eventtap.keyStroke({}, "Up", true) end)
