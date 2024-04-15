@@ -78,14 +78,40 @@ end)
 ----------------------------------------
 -- Directional Keybindings
 ----------------------------------------
-lhs.hotkey.bind({"ctrl", "option"}, "l",
-                function() lhs.eventtap.keyStroke({}, "Right", true) end)
---
-lhs.hotkey.bind({"ctrl", "option"}, "h",
-                function() lhs.eventtap.keyStroke({}, "Left", true) end)
+local repeatKey = nil
 
-lhs.hotkey.bind({"ctrl", "option"}, "j",
-                function() lhs.eventtap.keyStroke({}, "Down", true) end)
+local function keyHoldHandler(key)
+    -- Initialize or reset the timer to periodically trigger the keyStroke
+    if repeatKey then
+        repeatKey:stop() -- Stop the existing timer if it exists
+    end
+    repeatKey = lhs.timer.new(0.0001, function()
+        lhs.eventtap.keyStroke({}, key, true)
+    end)
+    repeatKey:start()
+end
 
-lhs.hotkey.bind({"ctrl", "option"}, "k",
-                function() lhs.eventtap.keyStroke({}, "Up", true) end)
+lhs.hotkey.bind({"ctrl", "option"}, "l", function() keyHoldHandler("Right") end,
+                function() -- This function is called on key release
+    if repeatKey then
+        repeatKey:stop() -- Stop the timer when the keys are released
+    end
+end)
+lhs.hotkey.bind({"ctrl", "option"}, "h", function() keyHoldHandler("Left") end,
+                function() -- This function is called on key release
+    if repeatKey then
+        repeatKey:stop() -- Stop the timer when the keys are released
+    end
+end)
+lhs.hotkey.bind({"ctrl", "option"}, "j", function() keyHoldHandler("Down") end,
+                function() -- This function is called on key release
+    if repeatKey then
+        repeatKey:stop() -- Stop the timer when the keys are released
+    end
+end)
+lhs.hotkey.bind({"ctrl", "option"}, "k", function() keyHoldHandler("Up") end,
+                function() -- This function is called on key release
+    if repeatKey then
+        repeatKey:stop() -- Stop the timer when the keys are released
+    end
+end)
