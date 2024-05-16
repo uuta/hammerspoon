@@ -115,3 +115,16 @@ lhs.hotkey.bind({"ctrl", "option"}, "k", function() keyHoldHandler("Up") end,
         repeatKey:stop() -- Stop the timer when the keys are released
     end
 end)
+
+lhs.hotkey.bind({"ctrl", "option"}, "'", function()
+    lhs.application.launchOrFocus("QuickTime Player")
+    lhs.timer.doAfter(1, function()
+        local quicktime = lhs.appfinder.appFromName("QuickTime Player")
+        if quicktime then
+            -- Close the window in Finder
+            lhs.eventtap.keyStroke({}, "Escape")
+            -- Open a new window to record the current screen
+            lhs.eventtap.keyStroke({"ctrl", "cmd"}, "n")
+        end
+    end)
+end)
