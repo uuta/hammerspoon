@@ -152,6 +152,7 @@ hs.hotkey.bind({ "ctrl", "option" }, "j", function()
 		{ name = "DevToys", resize = false },
 		{ name = "DeepL", resize = false },
 		{ name = "Finder", resize = false },
+		{ name = "OrbStack", resize = false },
 	}
 	local screens = hs.screen.allScreens()
 	if #screens < 2 then
