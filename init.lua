@@ -181,6 +181,7 @@ hs.hotkey.bind({ "ctrl", "option" }, "j", function()
 						winFrame.h
 					)
 				)
+				logger.d(string.format("external position: x=%d, y=%d, w=%d, h=%d", frame.x, frame.y, frame.w, frame.h))
 
 				if appInfo.resize then
 					-- Set the window frame to the external display
@@ -188,12 +189,12 @@ hs.hotkey.bind({ "ctrl", "option" }, "j", function()
 					-- if application has already been in external display
 				elseif winScreen == mainScreen then
 					-- Set the window frame to the external display without resizing
-					local newFrame = hs.geometry.rect(winFrame.x, winFrame.y, winFrame.w, winFrame.h)
+					local newFrame = hs.geometry.rect(frame.x / 2, winFrame.y, winFrame.w, winFrame.h)
 					win:setFrame(newFrame)
 				end
 			end
 		else
-			-- hs.console.log(string.format("%s not found!", appInfo.name))
+			logger.ef("%s not found!", appInfo.name)
 		end
 	end
 end)
