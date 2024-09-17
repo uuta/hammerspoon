@@ -138,7 +138,7 @@ end)
 ----------------------------------------
 -- External Display Window Management
 ----------------------------------------
-hs.hotkey.bind({ "ctrl", "option" }, "j", function()
+hs.hotkey.bind({ "ctrl", "option" }, "u", function()
 	local logger = hs.logger.new("windowManagement", "debug")
 	local apps = {
 		{ name = "Google Chrome", resize = true },
