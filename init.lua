@@ -16,6 +16,7 @@ local keys = {
 	{ { "ctrl" }, "Y", "Spotify" },
 	{ { "ctrl" }, "N", "Anki" },
 	{ { "ctrl" }, ";", "Figma" },
+	{ { "ctrl" }, "space", "Ghostty" },
 }
 
 for _, key in ipairs(keys) do
@@ -142,7 +143,7 @@ hs.hotkey.bind({ "ctrl", "option" }, "u", function()
 	local logger = hs.logger.new("windowManagement", "debug")
 	local apps = {
 		{ name = "Google Chrome", resize = true },
-		{ name = "iTerm", resize = true },
+		{ name = "Ghostty", resize = true },
 		{ name = "WezTerm", resize = true },
 		{ name = "DBeaver", resize = true },
 		{ name = "Spotify", resize = true },
