@@ -200,3 +200,31 @@ hs.hotkey.bind({ "ctrl", "option" }, "u", function()
 		end
 	end
 end)
+
+-- Hyper key definition for convenience
+-- Adjust to your own preference
+local hyper = { "ctrl", "option" }
+
+lhs.hotkey.bind(hyper, "k", function()
+	-- Get all running apps named "Google Chrome"
+	local chrome = lhs.application.find("Google Chrome")
+	if chrome then
+		-- Grab all windows of Chrome
+		local windows = chrome:allWindows()
+		if #windows > 0 then
+			-- Cycle to the next window
+			windows[1]:focus()
+			local currentIndex = 1
+			-- Move to the next window, you can expand logic as needed
+			currentIndex = currentIndex + 1
+			if currentIndex > #windows then
+				currentIndex = 1
+			end
+			windows[currentIndex]:focus()
+		else
+			lhs.alert.show("No Chrome windows open, bruh!")
+		end
+	else
+		lhs.alert.show("Chrome ain't running")
+	end
+end)
