@@ -1,4 +1,6 @@
 local lhs = hs
+lhs.logger.setGlobalLogLevel("debug")
+local windowLogger = lhs.logger.new("windowManagement", "debug")
 
 lhs.loadSpoon("ShiftIt")
 spoon.ShiftIt:bindHotkeys({
@@ -139,8 +141,8 @@ end)
 ----------------------------------------
 -- External Display Window Management
 ----------------------------------------
-hs.hotkey.bind({ "ctrl", "option" }, "u", function()
-	local logger = hs.logger.new("windowManagement", "debug")
+lhs.hotkey.bind({ "ctrl", "option" }, "u", function()
+	local logger = lhs.logger.new("windowManagement", "debug")
 	local apps = {
 		{ name = "Google Chrome", resize = true },
 		{ name = "Ghostty", resize = true },
@@ -155,13 +157,13 @@ hs.hotkey.bind({ "ctrl", "option" }, "u", function()
 		{ name = "Finder", resize = false },
 		{ name = "OrbStack", resize = false },
 	}
-	local screens = hs.screen.allScreens()
+	local screens = lhs.screen.allScreens()
 	if #screens < 2 then
-		hs.alert.show("External display not found!")
+		lhs.alert.show("External display not found!")
 		return
 	end
 	for _, appInfo in ipairs(apps) do
-		local app = hs.application.find(appInfo.name)
+		local app = lhs.application.find(appInfo.name)
 		if app then
 			local win = app:mainWindow()
 			if win then
@@ -170,7 +172,7 @@ hs.hotkey.bind({ "ctrl", "option" }, "u", function()
 				local externalScreen = screens[2]
 
 				local winFrame = win:frame()
-				local winScreen = hs.screen.find(winFrame)
+				local winScreen = lhs.screen.find(winFrame)
 				local frame = externalScreen:frame()
 
 				logger.d(string.format("appName: %s", appInfo.name))
@@ -191,7 +193,7 @@ hs.hotkey.bind({ "ctrl", "option" }, "u", function()
 					-- if application has already been in external display
 				elseif winScreen == mainScreen then
 					-- Set the window frame to the external display without resizing
-					local newFrame = hs.geometry.rect(frame.x / 2, winFrame.y, winFrame.w, winFrame.h)
+					local newFrame = lhs.geometry.rect(frame.x / 2, winFrame.y, winFrame.w, winFrame.h)
 					win:setFrame(newFrame)
 				end
 			end
@@ -201,30 +203,102 @@ hs.hotkey.bind({ "ctrl", "option" }, "u", function()
 	end
 end)
 
--- Hyper key definition for convenience
--- Adjust to your own preference
+-- Initialize state variables
+local chromeWindows = {}
+local currentWindowIndex = 0
+
+-- Logger for debugging
+local log = lhs.logger.new("windowManager", "debug")
+
+-- Function to update the Chrome windows list
+local function updateChromeWindows()
+	local chrome = lhs.application.find("Google Chrome")
+	if not chrome then
+		log.w("Google Chrome is not running.")
+		chromeWindows = {}
+		currentWindowIndex = 0
+		return
+	end
+
+	local allWindows = chrome:allWindows()
+	if not allWindows then
+		log.w("No Chrome windows found.")
+		chromeWindows = {}
+		currentWindowIndex = 0
+		return
+	end
+
+	chromeWindows = {}
+	for _, win in ipairs(allWindows) do
+		table.insert(chromeWindows, win)
+	end
+
+	log.d("Updated Chrome windows list. Total windows: " .. #chromeWindows)
+end
+
+-- Function to handle window focus
+local function chromeWindowFocused(win)
+	for index, window in ipairs(chromeWindows) do
+		if window:id() == win:id() then
+			currentWindowIndex = index
+			log.d("Focused on window #" .. currentWindowIndex)
+			break
+		end
+	end
+end
+
+-- Function to handle window creation
+local function chromeWindowCreated(win)
+	log.d("Chrome window created: " .. (win:title() or "Untitled"))
+	updateChromeWindows()
+end
+
+-- Function to handle window destruction
+local function chromeWindowDestroyed(win)
+	log.d("Chrome window destroyed: " .. (win:title() or "Untitled"))
+	updateChromeWindows()
+end
+
+-- Set up the window filter for Google Chrome
+local chromeWF = lhs.window.filter.new("Google Chrome"):setDefaultFilter({})
+
+-- Subscribe to window events
+chromeWF:subscribe(lhs.window.filter.windowFocused, chromeWindowFocused)
+chromeWF:subscribe(lhs.window.filter.windowCreated, chromeWindowCreated)
+chromeWF:subscribe(lhs.window.filter.windowDestroyed, chromeWindowDestroyed)
+
+-- Initial population of Chrome windows
+updateChromeWindows()
+
+-- Set up a timer to refresh Chrome windows every 5 seconds (optional)
+local refreshTimer = lhs.timer.new(5, function()
+	updateChromeWindows()
+end)
+refreshTimer:start()
+
+-- Define the hyper key combination
 local hyper = { "ctrl", "option" }
 
+-- Bind the hyper + k key to cycle Chrome windows
 lhs.hotkey.bind(hyper, "k", function()
-	-- Get all running apps named "Google Chrome"
-	local chrome = lhs.application.find("Google Chrome")
-	if chrome then
-		-- Grab all windows of Chrome
-		local windows = chrome:allWindows()
-		if #windows > 0 then
-			-- Cycle to the next window
-			windows[1]:focus()
-			local currentIndex = 1
-			-- Move to the next window, you can expand logic as needed
-			currentIndex = currentIndex + 1
-			if currentIndex > #windows then
-				currentIndex = 1
-			end
-			windows[currentIndex]:focus()
-		else
-			lhs.alert.show("No Chrome windows open, bruh!")
-		end
+	if #chromeWindows == 0 then
+		lhs.alert.show("No Chrome windows to cycle through!")
+		return
+	end
+
+	-- Calculate the next window index
+	local nextIndex = currentWindowIndex + 1
+	if nextIndex > #chromeWindows then
+		nextIndex = 1 -- Wrap around to the first window
+	end
+
+	-- Focus the next window
+	local nextWindow = chromeWindows[nextIndex]
+	if nextWindow then
+		nextWindow:focus()
+		currentWindowIndex = nextIndex
+		log.i("Cycling to Chrome window #" .. currentWindowIndex)
 	else
-		lhs.alert.show("Chrome ain't running")
+		log.e("Failed to focus Chrome window #" .. nextIndex)
 	end
 end)
