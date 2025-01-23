@@ -280,7 +280,7 @@ refreshTimer:start()
 local hyper = { "ctrl", "option" }
 
 -- Bind the hyper + k key to cycle Chrome windows
-lhs.hotkey.bind(hyper, "k", function()
+lhs.hotkey.bind(hyper, "m", function()
 	if #chromeWindows == 0 then
 		lhs.alert.show("No Chrome windows to cycle through!")
 		return
