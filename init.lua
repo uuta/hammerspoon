@@ -1,6 +1,5 @@
 local lhs = hs
 lhs.logger.setGlobalLogLevel("debug")
-local windowLogger = lhs.logger.new("windowManagement", "debug")
 
 lhs.loadSpoon("ShiftIt")
 spoon.ShiftIt:bindHotkeys({
@@ -156,6 +155,9 @@ lhs.hotkey.bind({ "ctrl", "option" }, "u", function()
 		{ name = "DeepL", resize = false },
 		{ name = "Finder", resize = false },
 		{ name = "OrbStack", resize = false },
+		{ name = "Slack", resize = false },
+		{ name = "ovice", resize = false },
+		{ name = "Visual Studio Code", resize = true },
 	}
 	local screens = lhs.screen.allScreens()
 	if #screens < 2 then
