@@ -18,6 +18,7 @@ local keys = {
 	{ { "ctrl" }, "N", "Anki" },
 	{ { "ctrl" }, ";", "Figma" },
 	{ { "ctrl" }, "space", "Ghostty" },
+	{ { "ctrl" }, "U", "Visual Studio Code" },
 }
 
 for _, key in ipairs(keys) do
@@ -195,7 +196,7 @@ lhs.hotkey.bind({ "ctrl", "option" }, "u", function()
 					-- if application has already been in external display
 				elseif winScreen == mainScreen then
 					-- Set the window frame to the external display without resizing
-					local newFrame = lhs.geometry.rect(frame.x / 2, winFrame.y, winFrame.w, winFrame.h)
+					local newFrame = hs.geometry.rect(frame.x / 2, winFrame.y, winFrame.w, winFrame.h)
 					win:setFrame(newFrame)
 				end
 			end
@@ -303,4 +304,61 @@ lhs.hotkey.bind(hyper, "m", function()
 	else
 		log.e("Failed to focus Chrome window #" .. nextIndex)
 	end
+end)
+
+----------------------------------------
+-- Chrome Video Control
+----------------------------------------
+local videoControlHotkeys = {
+	forward = lhs.hotkey.new({ "ctrl", "shift" }, "right", function()
+		local chrome = lhs.application.find("Google Chrome")
+		if chrome and chrome:isFrontmost() then
+			-- JavaScript to seek forward 5 seconds
+			local script = [[
+				var videos = document.querySelectorAll('video');
+				if (videos.length > 0) {
+					for (var i = 0; i < videos.length; i++) {
+						if (!videos[i].paused) {
+							videos[i].currentTime += 5;
+							break;
+						}
+					}
+				}
+			]]
+			lhs.osascript.javascript(script)
+			lhs.alert.show("⏩ +5s")
+		end
+	end),
+
+	backward = lhs.hotkey.new({ "ctrl", "shift" }, "left", function()
+		local chrome = lhs.application.find("Google Chrome")
+		if chrome and chrome:isFrontmost() then
+			-- JavaScript to seek backward 5 seconds
+			local script = [[
+				var videos = document.querySelectorAll('video');
+				if (videos.length > 0) {
+					for (var i = 0; i < videos.length; i++) {
+						if (!videos[i].paused) {
+							videos[i].currentTime -= 5;
+							break;
+						}
+					}
+				}
+			]]
+			lhs.osascript.javascript(script)
+			lhs.alert.show("⏪ -5s")
+		end
+	end),
+}
+
+-- Initialize a Google Chrome window filter for video controls
+local ChromeVideoWF = lhs.window.filter.new("Google Chrome")
+
+-- Enable hotkeys only when Chrome is focused
+ChromeVideoWF:subscribe(lhs.window.filter.windowFocused, function()
+	videoControlHotkeys.forward:enable()
+	videoControlHotkeys.backward:enable()
+end):subscribe(lhs.window.filter.windowUnfocused, function()
+	videoControlHotkeys.forward:disable()
+	videoControlHotkeys.backward:disable()
 end)
