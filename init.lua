@@ -11,14 +11,14 @@ spoon.ShiftIt:bindHotkeys({
 })
 
 local keys = {
-	{ { "ctrl" }, "P", "WezTerm" },
-	{ { "ctrl" }, "O", "Google Chrome" },
-	{ { "ctrl" }, "M", "DBeaver" },
-	{ { "ctrl" }, "Y", "Spotify" },
-	{ { "ctrl" }, "N", "Anki" },
-	{ { "ctrl" }, ";", "Figma" },
+	{ { "ctrl" }, "P",     "WezTerm" },
+	{ { "ctrl" }, "O",     "Google Chrome" },
+	{ { "ctrl" }, "M",     "DBeaver" },
+	{ { "ctrl" }, "Y",     "Spotify" },
+	{ { "ctrl" }, "N",     "Anki" },
+	{ { "ctrl" }, ";",     "Figma" },
 	{ { "ctrl" }, "space", "Ghostty" },
-	{ { "ctrl" }, "U", "Visual Studio Code" },
+	{ { "ctrl" }, ",",     "Cursor" },
 }
 
 for _, key in ipairs(keys) do
@@ -98,28 +98,28 @@ end
 
 lhs.hotkey.bind({ "ctrl", "option" }, "l", function()
 	keyHoldHandler("Right")
-end, function() -- This function is called on key release
+end, function()    -- This function is called on key release
 	if repeatKey then
 		repeatKey:stop() -- Stop the timer when the keys are released
 	end
 end)
 lhs.hotkey.bind({ "ctrl", "option" }, "h", function()
 	keyHoldHandler("Left")
-end, function() -- This function is called on key release
+end, function()    -- This function is called on key release
 	if repeatKey then
 		repeatKey:stop() -- Stop the timer when the keys are released
 	end
 end)
 lhs.hotkey.bind({ "ctrl", "option" }, "j", function()
 	keyHoldHandler("Down")
-end, function() -- This function is called on key release
+end, function()    -- This function is called on key release
 	if repeatKey then
 		repeatKey:stop() -- Stop the timer when the keys are released
 	end
 end)
 lhs.hotkey.bind({ "ctrl", "option" }, "k", function()
 	keyHoldHandler("Up")
-end, function() -- This function is called on key release
+end, function()    -- This function is called on key release
 	if repeatKey then
 		repeatKey:stop() -- Stop the timer when the keys are released
 	end
@@ -129,7 +129,7 @@ lhs.hotkey.bind({ "ctrl", "option" }, "'", function()
 	lhs.application.launchOrFocus("QuickTime Player")
 	lhs.timer.doAfter(1, function()
 		local quicktime = lhs.appfinder.appFromName("QuickTime Player")
-		if quicktime then
+		if quicktime then˙
 			-- Close the window in Finder
 			lhs.eventtap.keyStroke({}, "Escape")
 			-- Open a new window to record the current screen
@@ -144,20 +144,20 @@ end)
 lhs.hotkey.bind({ "ctrl", "option" }, "u", function()
 	local logger = lhs.logger.new("windowManagement", "debug")
 	local apps = {
-		{ name = "Google Chrome", resize = true },
-		{ name = "Ghostty", resize = true },
-		{ name = "WezTerm", resize = true },
-		{ name = "DBeaver", resize = true },
-		{ name = "Spotify", resize = true },
-		{ name = "Figma", resize = true },
-		{ name = "Hammerspoon", resize = false },
-		{ name = "Anki", resize = false },
-		{ name = "DevToys", resize = false },
-		{ name = "DeepL", resize = false },
-		{ name = "Finder", resize = false },
-		{ name = "OrbStack", resize = false },
-		{ name = "Slack", resize = false },
-		{ name = "ovice", resize = false },
+		{ name = "Google Chrome",      resize = true },
+		{ name = "Ghostty",            resize = true },
+		{ name = "WezTerm",            resize = true },
+		{ name = "DBeaver",            resize = true },
+		{ name = "Spotify",            resize = true },
+		{ name = "Figma",              resize = true },
+		{ name = "Hammerspoon",        resize = false },
+		{ name = "Anki",               resize = false },
+		{ name = "DevToys",            resize = false },
+		{ name = "DeepL",              resize = false },
+		{ name = "Finder",             resize = false },
+		{ name = "OrbStack",           resize = false },
+		{ name = "Slack",              resize = false },
+		{ name = "ovice",              resize = false },
 		{ name = "Visual Studio Code", resize = true },
 	}
 	local screens = lhs.screen.allScreens()
