@@ -16,9 +16,10 @@ local keys = {
 	{ { "ctrl" }, "M",     "DBeaver" },
 	{ { "ctrl" }, "Y",     "Spotify" },
 	{ { "ctrl" }, "N",     "Anki" },
-	{ { "ctrl" }, ";",     "Figma" },
+	{ { "ctrl" }, ";",     "Obsidian" },
 	{ { "ctrl" }, "space", "Ghostty" },
 	{ { "ctrl" }, ",",     "Cursor" },
+	{ { "ctrl" }, "9",     "Kindle" },
 }
 
 for _, key in ipairs(keys) do
@@ -129,7 +130,7 @@ lhs.hotkey.bind({ "ctrl", "option" }, "'", function()
 	lhs.application.launchOrFocus("QuickTime Player")
 	lhs.timer.doAfter(1, function()
 		local quicktime = lhs.appfinder.appFromName("QuickTime Player")
-		if quicktime then˙
+		if quicktime then
 			-- Close the window in Finder
 			lhs.eventtap.keyStroke({}, "Escape")
 			-- Open a new window to record the current screen
