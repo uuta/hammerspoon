@@ -57,29 +57,48 @@ _G.eventtap = lhs.eventtap.new({ lhs.eventtap.event.types.flagsChanged }, handle
 _G.eventtap:start()
 
 ----------------------------------------
--- Google Chrome Window Management
+-- Browser Window Management
 ----------------------------------------
-local chromeToRight = lhs.hotkey.new({ "ctrl" }, "l", function()
-  lhs.eventtap.keyStroke({ "cmd", "option" }, "Right", 0)
-end)
+local browserConfigs = {
+  { name = "Google Chrome" },
+  { name = "Brave Browser" },
+}
 
-local chromeToLeft = lhs.hotkey.new({ "ctrl" }, "h", function()
-  lhs.eventtap.keyStroke({ "cmd", "option" }, "Left", 0)
-end)
+local supportedBrowserSet = {}
+local browserHotkeys = {}
+local browserFilters = {}
 
--- Initialize a Google Chrome window filter
-local GoogleChromeWF = lhs.window.filter.new("Google Chrome")
+local function sendTabKey(direction)
+  lhs.eventtap.keyStroke({ "cmd", "option" }, direction, 0)
+end
 
--- Subscribe to when your Google Chrome window is focused and unfocused
-GoogleChromeWF:subscribe(lhs.window.filter.windowFocused, function()
-  -- Enable hotkey in Google Chrome
-  chromeToLeft:enable()
-  chromeToRight:enable()
-end):subscribe(lhs.window.filter.windowUnfocused, function()
-  -- Disable hotkey when focusing out of Google Chrome
-  chromeToLeft:disable()
-  chromeToRight:disable()
-end)
+for _, browser in ipairs(browserConfigs) do
+  supportedBrowserSet[browser.name] = true
+
+  local toRight = lhs.hotkey.new({ "ctrl" }, "l", function()
+    sendTabKey("Right")
+  end)
+
+  local toLeft = lhs.hotkey.new({ "ctrl" }, "h", function()
+    sendTabKey("Left")
+  end)
+
+  browserHotkeys[browser.name] = {
+    toLeft = toLeft,
+    toRight = toRight,
+  }
+
+  local filter = lhs.window.filter.new(browser.name)
+  filter:subscribe(lhs.window.filter.windowFocused, function()
+    toLeft:enable()
+    toRight:enable()
+  end):subscribe(lhs.window.filter.windowUnfocused, function()
+    toLeft:disable()
+    toRight:disable()
+  end)
+
+  browserFilters[browser.name] = filter
+end
 
 ----------------------------------------
 -- Directional Keybindings
@@ -99,28 +118,28 @@ end
 
 lhs.hotkey.bind({ "ctrl", "option" }, "l", function()
   keyHoldHandler("Right")
-end, function()    -- This function is called on key release
+end, function()      -- This function is called on key release
   if repeatKey then
     repeatKey:stop() -- Stop the timer when the keys are released
   end
 end)
 lhs.hotkey.bind({ "ctrl", "option" }, "h", function()
   keyHoldHandler("Left")
-end, function()    -- This function is called on key release
+end, function()      -- This function is called on key release
   if repeatKey then
     repeatKey:stop() -- Stop the timer when the keys are released
   end
 end)
 lhs.hotkey.bind({ "ctrl", "option" }, "j", function()
   keyHoldHandler("Down")
-end, function()    -- This function is called on key release
+end, function()      -- This function is called on key release
   if repeatKey then
     repeatKey:stop() -- Stop the timer when the keys are released
   end
 end)
 lhs.hotkey.bind({ "ctrl", "option" }, "k", function()
   keyHoldHandler("Up")
-end, function()    -- This function is called on key release
+end, function()      -- This function is called on key release
   if repeatKey then
     repeatKey:stop() -- Stop the timer when the keys are released
   end
@@ -207,159 +226,56 @@ lhs.hotkey.bind({ "ctrl", "option" }, "u", function()
   end
 end)
 
--- Initialize state variables
-local chromeWindows = {}
-local currentWindowIndex = 0
-
 -- Logger for debugging
 local log = lhs.logger.new("windowManager", "debug")
-
--- Function to update the Chrome windows list
-local function updateChromeWindows()
-  local chrome = lhs.application.find("Google Chrome")
-  if not chrome then
-    log.w("Google Chrome is not running.")
-    chromeWindows = {}
-    currentWindowIndex = 0
-    return
-  end
-
-  local allWindows = chrome:allWindows()
-  if not allWindows then
-    log.w("No Chrome windows found.")
-    chromeWindows = {}
-    currentWindowIndex = 0
-    return
-  end
-
-  chromeWindows = {}
-  for _, win in ipairs(allWindows) do
-    table.insert(chromeWindows, win)
-  end
-
-  log.d("Updated Chrome windows list. Total windows: " .. #chromeWindows)
-end
-
--- Function to handle window focus
-local function chromeWindowFocused(win)
-  for index, window in ipairs(chromeWindows) do
-    if window:id() == win:id() then
-      currentWindowIndex = index
-      log.d("Focused on window #" .. currentWindowIndex)
-      break
-    end
-  end
-end
-
--- Function to handle window creation
-local function chromeWindowCreated(win)
-  log.d("Chrome window created: " .. (win:title() or "Untitled"))
-  updateChromeWindows()
-end
-
--- Function to handle window destruction
-local function chromeWindowDestroyed(win)
-  log.d("Chrome window destroyed: " .. (win:title() or "Untitled"))
-  updateChromeWindows()
-end
-
--- Set up the window filter for Google Chrome
-local chromeWF = lhs.window.filter.new("Google Chrome"):setDefaultFilter({})
-
--- Subscribe to window events
-chromeWF:subscribe(lhs.window.filter.windowFocused, chromeWindowFocused)
-chromeWF:subscribe(lhs.window.filter.windowCreated, chromeWindowCreated)
-chromeWF:subscribe(lhs.window.filter.windowDestroyed, chromeWindowDestroyed)
-
--- Initial population of Chrome windows
-updateChromeWindows()
-
--- Set up a timer to refresh Chrome windows every 5 seconds (optional)
-local refreshTimer = lhs.timer.new(5, function()
-  updateChromeWindows()
-end)
-refreshTimer:start()
 
 -- Define the hyper key combination
 local hyper = { "ctrl", "option" }
 
--- Bind the hyper + k key to cycle Chrome windows
-lhs.hotkey.bind(hyper, "m", function()
-  if #chromeWindows == 0 then
-    lhs.alert.show("No Chrome windows to cycle through!")
+local function cycleBrowserWindows()
+  local frontApp = lhs.application.frontmostApplication()
+  if not frontApp then
+    lhs.alert.show("No active application to cycle")
     return
   end
 
-  -- Calculate the next window index
-  local nextIndex = currentWindowIndex + 1
-  if nextIndex > #chromeWindows then
-    nextIndex = 1 -- Wrap around to the first window
+  local appName = frontApp:name()
+  if not supportedBrowserSet[appName] then
+    lhs.alert.show("Cycle works only in Chrome or Brave")
+    return
   end
 
-  -- Focus the next window
-  local nextWindow = chromeWindows[nextIndex]
+  local allWindows = frontApp:allWindows()
+  if not allWindows or #allWindows == 0 then
+    lhs.alert.show(string.format("No %s windows to cycle through!", appName))
+    return
+  end
+
+  local focusedWindow = frontApp:focusedWindow()
+  local currentIndex = 0
+
+  if focusedWindow then
+    for index, window in ipairs(allWindows) do
+      if window:id() == focusedWindow:id() then
+        currentIndex = index
+        break
+      end
+    end
+  end
+
+  local nextIndex = currentIndex + 1
+  if nextIndex > #allWindows then
+    nextIndex = 1
+  end
+
+  local nextWindow = allWindows[nextIndex]
   if nextWindow then
     nextWindow:focus()
-    currentWindowIndex = nextIndex
-    log.i("Cycling to Chrome window #" .. currentWindowIndex)
+    log.i(string.format("Cycling %s window #%d", appName, nextIndex))
   else
-    log.e("Failed to focus Chrome window #" .. nextIndex)
+    log.e(string.format("Failed to focus %s window #%d", appName, nextIndex))
   end
-end)
+end
 
-----------------------------------------
--- Chrome Video Control
-----------------------------------------
-local videoControlHotkeys = {
-  forward = lhs.hotkey.new({ "ctrl", "shift" }, "right", function()
-    local chrome = lhs.application.find("Google Chrome")
-    if chrome and chrome:isFrontmost() then
-      -- JavaScript to seek forward 5 seconds
-      local script = [[
-				var videos = document.querySelectorAll('video');
-				if (videos.length > 0) {
-					for (var i = 0; i < videos.length; i++) {
-						if (!videos[i].paused) {
-							videos[i].currentTime += 5;
-							break;
-						}
-					}
-				}
-			]]
-      lhs.osascript.javascript(script)
-      lhs.alert.show("⏩ +5s")
-    end
-  end),
-
-  backward = lhs.hotkey.new({ "ctrl", "shift" }, "left", function()
-    local chrome = lhs.application.find("Google Chrome")
-    if chrome and chrome:isFrontmost() then
-      -- JavaScript to seek backward 5 seconds
-      local script = [[
-				var videos = document.querySelectorAll('video');
-				if (videos.length > 0) {
-					for (var i = 0; i < videos.length; i++) {
-						if (!videos[i].paused) {
-							videos[i].currentTime -= 5;
-							break;
-						}
-					}
-				}
-			]]
-      lhs.osascript.javascript(script)
-      lhs.alert.show("⏪ -5s")
-    end
-  end),
-}
-
--- Initialize a Google Chrome window filter for video controls
-local ChromeVideoWF = lhs.window.filter.new("Google Chrome")
-
--- Enable hotkeys only when Chrome is focused
-ChromeVideoWF:subscribe(lhs.window.filter.windowFocused, function()
-  videoControlHotkeys.forward:enable()
-  videoControlHotkeys.backward:enable()
-end):subscribe(lhs.window.filter.windowUnfocused, function()
-  videoControlHotkeys.forward:disable()
-  videoControlHotkeys.backward:disable()
-end)
+-- Bind the hyper + m key to cycle windows in the active browser
+lhs.hotkey.bind(hyper, "m", cycleBrowserWindows)
